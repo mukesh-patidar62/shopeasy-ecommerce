@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Order Confirmed - ShopEasy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-5 text-center" style="max-width:480px;">
+    <h1 class="text-success">✅</h1>
+    <h3>Order Confirmed!</h3>
+    <p>Thank you — your order #<span th:text="${order.id}"></span> has been placed successfully.</p>
+    <p>Status: <strong th:text="${order.status}"></strong></p>
+    <a href="/orders" class="btn btn-primary mt-3">View My Orders</a>
+    <a href="/" class="btn btn-outline-secondary mt-3">Continue Shopping</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

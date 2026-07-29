@@ -1,0 +1,79 @@
+package com.ecommerce.service;
+
+import com.ecommerce.entity.*;
+import com.ecommerce.repository.OrderRepository;
+import com.ecommerce.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+
+    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+    }
+
+    /**
+     * cartItems: map of productId -> quantity
+     */
+    public Orders createOrderFromCart(User customer, Map<Long, Integer> cartItems,
+                                       String shippingName, String shippingPhone, String shippingAddress) {
+        Orders order = new Orders();
+        order.setCustomer(customer);
+        order.setShippingName(shippingName);
+        order.setShippingPhone(shippingPhone);
+        order.setShippingAddress(shippingAddress);
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Map.Entry<Long, Integer> entry : cartItems.entrySet()) {
+            Product product = productRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found: " + entry.getKey()));
+            int qty = entry.getValue();
+
+            OrderItem item = new OrderItem();
+            item.setOrder(order);
+            item.setProduct(product);
+            item.setQuantity(qty);
+            item.setPriceAtPurchase(product.getPrice());
+            order.getItems().add(item);
+
+            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(qty)));
+        }
+        order.setTotalAmount(total);
+        return orderRepository.save(order);
+    }
+
+    public Orders save(Orders order) {
+        return orderRepository.save(order);
+    }
+
+    public Orders findById(Long id) {
+        return orderRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Order not found: " + id));
+    }
+
+    public List<Orders> findByCustomer(User customer) {
+        return orderRepository.findByCustomerOrderByCreatedAtDesc(customer);
+    }
+
+    public List<Orders> findAll() {
+        return orderRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    /** Reduce stock once payment is confirmed. */
+    public void reduceStock(Orders order) {
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            int newStock = Math.max(0, product.getStock() - item.getQuantity());
+            product.setStock(newStock);
+            productRepository.save(product);
+        }
+    }
+}

@@ -1,0 +1,9 @@
+target/
+   *.class
+   .idea/
+   *.iml
+   uploads/
+   .vscode/
+   .DS_Store
+   application.properties
+/src/main/resources/application.properties
