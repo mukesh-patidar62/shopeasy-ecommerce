@@ -27,7 +27,8 @@ public class AdminController {
     private final UserService userService;
     private final OrderService orderService;
 
-    public AdminController(ProductService productService, UserService userService, OrderService orderService) {
+    public AdminController(AiDescriptionService aiDescriptionService, ProductService productService, UserService userService, OrderService orderService) {
+        this.aiDescriptionService = aiDescriptionService;
         this.productService = productService;
         this.userService = userService;
         this.orderService = orderService;
