@@ -49,7 +49,11 @@ public class SecurityConfig {
             )
             .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
             .authenticationProvider(authenticationProvider())
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/payment/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(
+                        "/h2-console/**",
+                        "/api/payment/**",
+                        "/admin/products/generate-description"
+                ))
             .headers(headers -> headers.frameOptions(frame -> frame.disable())); // needed for h2-console
 
         return http.build();
