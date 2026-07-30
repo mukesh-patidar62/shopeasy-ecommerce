@@ -44,6 +44,7 @@ public class AiDescriptionService {
                     .getString("text")
                     .trim();
         } catch (Exception e) {
+            e.printStackTrace();
             return "Could not generate a description right now — please write one manually.";
         }
     }
