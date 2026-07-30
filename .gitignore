@@ -5,5 +5,5 @@ target/
    uploads/
    .vscode/
    .DS_Store
-   application.properties
-/src/main/resources/application.properties
+
+
