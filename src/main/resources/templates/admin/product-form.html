@@ -23,8 +23,35 @@
 
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3" th:text="${product.description}"></textarea>
+            <textarea id="descriptionField" name="description" class="form-control" rows="3" th:text="${product.description}"></textarea>
+            <button type="button" id="generateBtn" class="btn btn-sm btn-outline-primary mt-2">✨ Generate with AI</button>
+            <span id="genStatus" class="small text-muted ms-2"></span>
         </div>
+
+        <script>
+            document.getElementById('generateBtn').addEventListener('click', async function () {
+                const name = document.querySelector('input[name="name"]').value;
+                const category = document.querySelector('input[name="category"]').value;
+                const status = document.getElementById('genStatus');
+
+                if (!name) {
+                    status.textContent = 'Enter a product name first.';
+                    return;
+                }
+
+                status.textContent = 'Generating...';
+                try {
+                    const res = await fetch('/admin/products/generate-description?name=' + encodeURIComponent(name) + '&category=' + encodeURIComponent(category), {
+                        method: 'POST'
+                    });
+                    const data = await res.json();
+                    document.getElementById('descriptionField').value = data.description;
+                    status.textContent = '';
+                } catch (err) {
+                    status.textContent = 'Generation failed. Try again.';
+                }
+            });
+        </script>
 
         <div class="row">
             <div class="col-6 mb-3">

@@ -1,4 +1,6 @@
 package com.ecommerce.controller;
+import com.ecommerce.service.AiDescriptionService;
+import java.util.Map;
 
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
@@ -18,6 +20,9 @@ import java.io.IOException;
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final AiDescriptionService aiDescriptionService;
+
+    // add aiDescriptionService to the existing constructor parameters and assignment
     private final ProductService productService;
     private final UserService userService;
     private final OrderService orderService;
@@ -26,6 +31,13 @@ public class AdminController {
         this.productService = productService;
         this.userService = userService;
         this.orderService = orderService;
+    }
+    @PostMapping("/products/generate-description")
+    @ResponseBody
+    public Map<String, String> generateDescription(@RequestParam String name,
+                                                   @RequestParam(required = false) String category) {
+        String description = aiDescriptionService.generateDescription(name, category);
+        return Map.of("description", description);
     }
 
     @GetMapping("/dashboard")
