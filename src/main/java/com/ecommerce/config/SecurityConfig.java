@@ -36,25 +36,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/uploads/**", "/products", "/products/**", "/h2-console/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/cart/**", "/checkout/**", "/payment/**", "/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
-            .authenticationProvider(authenticationProvider())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/uploads/**", "/products", "/products/**", "/h2-console/**", "/api/chat").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/cart/**", "/checkout/**", "/payment/**", "/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
+                .authenticationProvider(authenticationProvider())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
                         "/h2-console/**",
                         "/api/payment/**",
-                        "/admin/products/generate-description"
+                        "/admin/products/generate-description",
+                        "/api/chat"
                 ))
-            .headers(headers -> headers.frameOptions(frame -> frame.disable())); // needed for h2-console
+                .headers(headers -> headers.frameOptions(frame -> frame.disable())); // needed for h2-console
 
         return http.build();
     }
