@@ -18,7 +18,7 @@ public class AiDescriptionService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String generateDescription(String productName, String category) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey;
 
         String prompt = "Write a concise, appealing e-commerce product description (2-3 sentences, "
                 + "no headings, no markdown) for a product called \"" + productName + "\""
