@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -10,24 +11,113 @@
 <body>
 <div th:replace="~{fragments/nav :: nav}"></div>
 
-<div class="container py-4">
-    <h2 class="mb-4">All Products</h2>
-    <div th:if="${#lists.isEmpty(products)}" class="alert alert-info">
-        No products yet. Log in as admin to add some!
+<!-- Trust strip -->
+<div class="trust-strip">
+    <div class="container d-flex flex-wrap justify-content-center justify-content-md-between gap-3 py-2">
+        <span>🚚 Free delivery on orders above ₹499</span>
+        <span>🔒 Secure payments via Razorpay</span>
+        <span>↩️ 7-day easy returns</span>
+        <span>🕐 Admins restock daily</span>
     </div>
-    <div class="row g-3">
-        <div class="col-6 col-md-4 col-lg-3" th:each="product : ${products}">
-            <div class="card product-card shadow-sm">
-                <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" class="card-img-top" alt="product image">
-                <div th:unless="${product.imageUrl}" class="product-image-placeholder d-flex align-items-center justify-content-center text-muted">No image</div>
-                <div class="card-body d-flex flex-column">
-                    <h6 class="card-title" th:text="${product.name}">Product name</h6>
-                    <p class="price-tag mb-1" th:text="'₹' + ${product.price}">₹0</p>
-                    <p class="small text-muted mb-2" th:text="${product.stock > 0} ? ('In stock: ' + ${product.stock}) : 'Out of stock'">Stock</p>
-                    <a th:href="@{'/products/' + ${product.id}}" class="btn btn-outline-primary btn-sm mt-auto">View</a>
+</div>
+
+<div class="container-fluid px-3 px-md-4 py-4">
+    <div class="row g-4">
+
+        <!-- Category sidebar -->
+        <aside class="col-12 col-lg-2">
+            <div class="category-panel">
+                <h6 class="category-panel-title">Categories</h6>
+                <a th:href="@{/}" class="category-link" th:classappend="${selectedCategory == null} ? 'active'">All Products</a>
+                <a th:each="cat : ${categories}"
+                   th:href="@{/(category=${cat})}"
+                   th:text="${cat}"
+                   class="category-link"
+                   th:classappend="${selectedCategory != null and #strings.equalsIgnoreCase(selectedCategory, cat)} ? 'active'">Category</a>
+                <p th:if="${#lists.isEmpty(categories)}" class="small text-muted mb-0">Categories appear here once products are added.</p>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="col-12 col-lg-10">
+
+            <!-- Hero carousel -->
+            <div id="heroCarousel" class="carousel slide hero-carousel mb-4" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="hero-slide" style="background-image: url('https://picsum.photos/seed/shopeasy-hero-1/1200/420')">
+                            <div class="hero-slide-overlay">
+                                <span class="hero-eyebrow">Fresh stock, added daily</span>
+                                <h1>Everything you need, from a stall that never closes.</h1>
+                                <a href="#productGrid" class="btn btn-primary">Shop Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="hero-slide" style="background-image: url('https://picsum.photos/seed/shopeasy-hero-2/1200/420')">
+                            <div class="hero-slide-overlay">
+                                <span class="hero-eyebrow">Straight from the vendor's phone</span>
+                                <h1>No middlemen. Just what's on the shelf right now.</h1>
+                                <a href="#productGrid" class="btn btn-primary">Browse Products</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="hero-slide" style="background-image: url('https://picsum.photos/seed/shopeasy-hero-3/1200/420')">
+                            <div class="hero-slide-overlay">
+                                <span class="hero-eyebrow">Secure checkout</span>
+                                <h1>Pay safely with Razorpay, every time.</h1>
+                                <a href="#productGrid" class="btn btn-primary">Start Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
                 </div>
             </div>
-        </div>
+
+            <h2 id="productGrid" class="section-heading" th:text="${selectedCategory} ? ('Category: ' + ${selectedCategory}) : 'Trending Products'">All Products</h2>
+
+            <div th:if="${#lists.isEmpty(products)}" class="alert" style="background: var(--paper-raised); border: 1px dashed var(--line);">
+                Nothing here yet. Log in as admin to add the first item.
+            </div>
+
+            <div class="row g-3">
+                <div class="col-6 col-md-4 col-xl-3" th:each="product : ${products}">
+                    <div class="card product-card">
+                        <div class="product-img-wrap">
+                            <span th:if="${product.originalPrice != null and product.originalPrice > product.price}"
+                                  class="discount-badge"
+                                  th:text="'-' + ${#numbers.formatDecimal((product.originalPrice - product.price) / product.originalPrice * 100, 0, 0)} + '%'">-20%</span>
+                            <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="product image">
+                            <img th:unless="${product.imageUrl}" th:src="'https://picsum.photos/seed/' + ${#strings.replace(product.name,' ','-')} + '/400/300'" alt="product image">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title" th:text="${product.name}">Product name</h6>
+                            <p class="small text-muted mb-1" th:if="${product.category}" th:text="${product.category}">Category</p>
+                            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                <span class="price-tag" th:text="'₹' + ${product.price}">₹0</span>
+                                <span th:if="${product.originalPrice != null and product.originalPrice > product.price}"
+                                      class="text-muted text-decoration-line-through small"
+                                      th:text="'₹' + ${product.originalPrice}">₹0</span>
+                            </div>
+                            <span class="stock-chip mb-2" th:classappend="${product.stock > 0} ? 'in' : 'out'"
+                                  th:text="${product.stock > 0} ? ('In stock: ' + ${product.stock}) : 'Out of stock'">Stock</span>
+                            <a th:href="@{'/products/' + ${product.id}}" class="btn btn-outline-primary btn-sm mt-auto">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 </div>
 

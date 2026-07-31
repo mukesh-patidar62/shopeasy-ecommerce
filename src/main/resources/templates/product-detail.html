@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -14,12 +15,17 @@
     <div class="row g-4">
         <div class="col-md-6">
             <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" class="img-fluid rounded shadow-sm" alt="product image">
-            <div th:unless="${product.imageUrl}" class="product-image-placeholder rounded d-flex align-items-center justify-content-center text-muted" style="height:320px;">No image</div>
+            <img th:unless="${product.imageUrl}" th:src="'https://picsum.photos/seed/' + ${#strings.replace(product.name,' ','-')} + '/500/400'" class="img-fluid rounded shadow-sm" alt="product image">
         </div>
         <div class="col-md-6">
             <h2 th:text="${product.name}">Name</h2>
             <p class="text-muted" th:text="${product.category}">Category</p>
-            <h4 class="price-tag" th:text="'₹' + ${product.price}">₹0</h4>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                <h4 class="price-tag mb-0" th:text="'₹' + ${product.price}">₹0</h4>
+                <span th:if="${product.originalPrice != null and product.originalPrice > product.price}"
+                      class="text-muted text-decoration-line-through"
+                      th:text="'₹' + ${product.originalPrice}">₹0</span>
+            </div>
             <p th:text="${product.description}">Description</p>
             <p class="small" th:text="${product.stock > 0} ? ('In stock: ' + ${product.stock}) : 'Out of stock'"></p>
 

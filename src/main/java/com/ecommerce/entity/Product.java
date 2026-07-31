@@ -23,6 +23,13 @@ public class Product {
     @Positive
     private BigDecimal price;
 
+    // Optional: set this to show a struck-through "before" price when the item is discounted.
+    // Leave null if there's no discount - we never fabricate a fake original price.
+    private BigDecimal originalPrice;
+
+    public BigDecimal getOriginalPrice() { return originalPrice; }
+    public void setOriginalPrice(BigDecimal originalPrice) { this.originalPrice = originalPrice; }
+
     private Integer stock = 0;
 
     private String category;
