@@ -61,8 +61,8 @@ public class AdminController {
 
     @PostMapping("/products/save")
     public String saveProduct(@ModelAttribute Product product,
-                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                               @AuthenticationPrincipal UserDetails principal) throws IOException {
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                              @AuthenticationPrincipal UserDetails principal) throws Exception {
         User admin = userService.findByEmail(principal.getUsername());
 
         // preserve existing image if editing and no new file chosen

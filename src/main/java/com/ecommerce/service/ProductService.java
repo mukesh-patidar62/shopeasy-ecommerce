@@ -1,27 +1,31 @@
 package com.ecommerce.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
 import com.ecommerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
 
-    @Value("${app.upload.dir}")
-    private String uploadDir;
+    @Value("${cloudinary.cloud-name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api-key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api-secret}")
+    private String apiSecret;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -36,9 +40,9 @@ public class ProductService {
                 new IllegalArgumentException("Product not found: " + id));
     }
 
-    public Product save(Product product, MultipartFile imageFile, User admin) throws IOException {
+    public Product save(Product product, MultipartFile imageFile, User admin) throws Exception {
         if (imageFile != null && !imageFile.isEmpty()) {
-            product.setImageUrl(storeImage(imageFile));
+            product.setImageUrl(uploadToCloudinary(imageFile));
         }
         if (product.getCreatedBy() == null) {
             product.setCreatedBy(admin);
@@ -50,16 +54,23 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    private String storeImage(MultipartFile file) throws IOException {
-        String original = StringUtils.cleanPath(file.getOriginalFilename() == null ? "image" : file.getOriginalFilename());
-        String ext = original.contains(".") ? original.substring(original.lastIndexOf('.')) : "";
-        String filename = UUID.randomUUID() + ext;
+    /**
+     * Uploads the image to Cloudinary (persistent cloud storage) and returns
+     * the permanent HTTPS URL. This survives redeploys, unlike local disk
+     * storage, which gets wiped every time Render spins up a fresh container.
+     */
+    private String uploadToCloudinary(MultipartFile file) throws Exception {
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret,
+                "secure", true
+        ));
 
-        Path dirPath = Paths.get(uploadDir);
-        Files.createDirectories(dirPath);
-        Path target = dirPath.resolve(filename);
-        Files.copy(file.getInputStream(), target);
+        Map<String, Object> options = new HashMap<>();
+        options.put("folder", "shopeasy-products");
 
-        return "/uploads/" + filename;
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
+        return (String) uploadResult.get("secure_url");
     }
 }
