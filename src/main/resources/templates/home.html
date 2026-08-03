@@ -87,6 +87,15 @@
 
             <h2 id="productGrid" class="section-heading" th:text="${selectedCategory} ? ('Category: ' + ${selectedCategory}) : 'Trending Products'">All Products</h2>
 
+            <form th:action="@{/}" method="get" class="d-flex mb-4" style="max-width:420px;">
+                <input type="text" name="search" class="form-control me-2" placeholder="Search products..." th:value="${searchQuery}">
+                <input type="hidden" name="category" th:value="${selectedCategory}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+            <p th:if="${searchQuery}" class="small text-muted mt-n3 mb-3">
+                Showing results for "<span th:text="${searchQuery}"></span>" — <a th:href="@{/}">clear search</a>
+            </p>
+
             <div th:if="${#lists.isEmpty(products)}" class="alert" style="background: var(--paper-raised); border: 1px dashed var(--line);">
                 Nothing here yet. Log in as admin to add the first item.
             </div>

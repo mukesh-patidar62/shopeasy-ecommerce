@@ -20,6 +20,11 @@
         <div class="col-md-6">
             <h2 th:text="${product.name}">Name</h2>
             <p class="text-muted" th:text="${product.category}">Category</p>
+            <div class="mb-2" th:if="${!#lists.isEmpty(reviews)}">
+                <span class="fw-semibold" th:text="${#numbers.formatDecimal(averageRating, 1, 1)} + ' / 5'">4.5 / 5</span>
+                <span class="text-muted small" th:text="'(' + ${#lists.size(reviews)} + ' review' + (${#lists.size(reviews)} > 1 ? 's' : '') + ')'">(3 reviews)</span>
+            </div>
+            <p class="text-muted small" th:if="${#lists.isEmpty(reviews)}">No reviews yet.</p>
             <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
                 <h4 class="price-tag mb-0" th:text="'₹' + ${product.price}">₹0</h4>
                 <span th:if="${product.originalPrice != null and product.originalPrice > product.price}"
@@ -37,6 +42,50 @@
                 <button class="btn btn-success" type="submit">Add to Cart</button>
             </form>
             <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-primary">Log in to buy</a>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row">
+        <div class="col-lg-8">
+            <h4 class="section-heading">Customer Reviews</h4>
+
+            <div th:if="${#lists.isEmpty(reviews)}" class="text-muted">
+                Be the first to review this product — reviews are only from customers who've actually purchased it.
+            </div>
+
+            <div th:each="review : ${reviews}" class="mb-3 pb-3" style="border-bottom: 1px solid var(--line);">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong th:text="${review.customer.fullName}">Customer name</strong>
+                    <span class="mono small" th:text="${review.rating} + ' / 5'">5 / 5</span>
+                </div>
+                <p class="mb-1" th:text="${review.comment}">Review comment</p>
+                <p class="small text-muted mb-0" th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}"></p>
+            </div>
+
+            <!-- Only shown to customers who purchased this product and haven't already reviewed it -->
+            <div th:if="${canReview}" class="mt-4">
+                <h6>Write a review</h6>
+                <div th:if="${reviewError}" class="alert alert-danger small" th:text="${reviewError}"></div>
+                <form th:action="@{'/products/' + ${product.id} + '/reviews'}" method="post">
+                    <div class="mb-2">
+                        <label class="form-label small">Rating</label>
+                        <select name="rating" class="form-select" style="max-width:140px;" required>
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Good</option>
+                            <option value="3">3 - Okay</option>
+                            <option value="2">2 - Not great</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">Comment</label>
+                        <textarea name="comment" class="form-control" rows="3" placeholder="What did you think?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
