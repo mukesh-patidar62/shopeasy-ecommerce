@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -27,9 +28,16 @@
                 <td data-label="Address" th:text="${order.shippingAddress}"></td>
                 <td data-label="Total" th:text="'₹' + ${order.totalAmount}"></td>
                 <td data-label="Status">
-                    <span class="badge"
-                          th:classappend="${order.status.name() == 'PAID'} ? 'bg-success' : (${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 'bg-danger')"
+                    <span class="badge mb-1 d-block"
+                          th:classappend="${order.status.name() == 'PAID'} ? 'bg-success' : (${order.status.name() == 'SHIPPED'} ? 'bg-info text-dark' : (${order.status.name() == 'DELIVERED'} ? 'bg-primary' : (${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 'bg-danger')))"
                           th:text="${order.status}"></span>
+                    <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="d-flex gap-1" th:if="${order.status.name() == 'PAID' or order.status.name() == 'SHIPPED'}">
+                        <select name="status" class="form-select form-select-sm">
+                            <option th:if="${order.status.name() == 'PAID'}" value="SHIPPED">Mark Shipped</option>
+                            <option th:if="${order.status.name() == 'SHIPPED'}" value="DELIVERED">Mark Delivered</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
+                    </form>
                 </td>
                 <td data-label="Date" th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, HH:mm')}"></td>
             </tr>

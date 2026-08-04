@@ -41,6 +41,12 @@ public class AdminController {
         return Map.of("description", description);
     }
 
+    @PostMapping("/orders/{id}/status")
+    public String updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
+        orderService.updateStatus(id, com.ecommerce.entity.Orders.OrderStatus.valueOf(status));
+        return "redirect:/admin/orders";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("products", productService.findAll());

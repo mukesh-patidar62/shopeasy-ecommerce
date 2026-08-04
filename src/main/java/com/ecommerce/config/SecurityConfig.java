@@ -37,7 +37,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/uploads/**", "/products", "/products/**", "/h2-console/**", "/api/chat").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/products/*/reviews").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/uploads/**", "/products", "/products/**", "/h2-console/**", "/api/chat", "/api/webhooks/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/cart/**", "/checkout/**", "/payment/**", "/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()

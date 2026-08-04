@@ -24,7 +24,7 @@ public class OrderService {
      * cartItems: map of productId -> quantity
      */
     public Orders createOrderFromCart(User customer, Map<Long, Integer> cartItems,
-                                       String shippingName, String shippingPhone, String shippingAddress) {
+                                      String shippingName, String shippingPhone, String shippingAddress) {
         Orders order = new Orders();
         order.setCustomer(customer);
         order.setShippingName(shippingName);
@@ -75,5 +75,28 @@ public class OrderService {
             product.setStock(newStock);
             productRepository.save(product);
         }
+    }
+
+    /** Admin manually advances an order's status (e.g. Paid -> Shipped -> Delivered). */
+    public Orders updateStatus(Long orderId, Orders.OrderStatus newStatus) {
+        Orders order = findById(orderId);
+        order.setStatus(newStatus);
+        return orderRepository.save(order);
+    }
+
+    /**
+     * Called by the Razorpay webhook as a safety net: if the client-side payment
+     * confirmation never reached our server (e.g. browser closed right after paying),
+     * this marks the order paid from the server-to-server webhook instead.
+     * Idempotent - safe to call even if the order is already PAID.
+     */
+    public void markPaidFromWebhook(String razorpayOrderId) {
+        orderRepository.findByRazorpayOrderId(razorpayOrderId).ifPresent(order -> {
+            if (order.getStatus() == Orders.OrderStatus.PENDING) {
+                order.setStatus(Orders.OrderStatus.PAID);
+                orderRepository.save(order);
+                reduceStock(order);
+            }
+        });
     }
 }

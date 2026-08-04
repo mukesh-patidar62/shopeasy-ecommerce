@@ -37,7 +37,7 @@ public class Orders {
     private List<OrderItem> items = new ArrayList<>();
 
     public enum OrderStatus {
-        PENDING, PAID, FAILED, CANCELLED
+        PENDING, PAID, SHIPPED, DELIVERED, FAILED, CANCELLED
     }
 
     public Long getId() { return id; }
