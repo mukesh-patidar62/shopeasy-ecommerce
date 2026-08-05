@@ -34,13 +34,21 @@
             <p th:text="${product.description}">Description</p>
             <p class="small" th:text="${product.stock > 0} ? ('In stock: ' + ${product.stock}) : 'Out of stock'"></p>
 
-            <form th:action="@{'/cart/add/' + ${product.id}}" method="post" sec:authorize="hasRole('CUSTOMER')" th:if="${product.stock > 0}">
-                <div class="input-group mb-3" style="max-width:200px;">
-                    <span class="input-group-text">Qty</span>
-                    <input type="number" name="quantity" value="1" min="1" th:max="${product.stock}" class="form-control">
-                </div>
-                <button class="btn btn-success" type="submit">Add to Cart</button>
-            </form>
+            <div class="d-flex gap-2 flex-wrap">
+                <form th:action="@{'/cart/add/' + ${product.id}}" method="post" sec:authorize="hasRole('CUSTOMER')" th:if="${product.stock > 0}">
+                    <div class="input-group mb-3" style="max-width:200px;">
+                        <span class="input-group-text">Qty</span>
+                        <input type="number" name="quantity" value="1" min="1" th:max="${product.stock}" class="form-control">
+                    </div>
+                    <button class="btn btn-success" type="submit">Add to Cart</button>
+                </form>
+                <form th:action="@{'/wishlist/add/' + ${product.id}}" method="post" sec:authorize="hasRole('CUSTOMER')" th:if="${!inWishlist}">
+                    <button class="btn btn-outline-primary" type="submit">♡ Save for later</button>
+                </form>
+                <form th:action="@{'/wishlist/remove/' + ${product.id}}" method="post" sec:authorize="hasRole('CUSTOMER')" th:if="${inWishlist}">
+                    <button class="btn btn-primary" type="submit">♥ Saved</button>
+                </form>
+            </div>
             <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-primary">Log in to buy</a>
         </div>
     </div>

@@ -50,6 +50,7 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("products", productService.findAll());
+        model.addAttribute("lowStockProducts", productService.findLowStock(5));
         return "admin/dashboard";
     }
 

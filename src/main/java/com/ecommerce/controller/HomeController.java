@@ -5,6 +5,7 @@ import com.ecommerce.entity.User;
 import com.ecommerce.service.ProductService;
 import com.ecommerce.service.ReviewService;
 import com.ecommerce.service.UserService;
+import com.ecommerce.service.WishlistService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -22,11 +23,14 @@ public class HomeController {
     private final ProductService productService;
     private final ReviewService reviewService;
     private final UserService userService;
+    private final WishlistService wishlistService;
 
-    public HomeController(ProductService productService, ReviewService reviewService, UserService userService) {
+    public HomeController(ProductService productService, ReviewService reviewService,
+                          UserService userService, WishlistService wishlistService) {
         this.productService = productService;
         this.reviewService = reviewService;
         this.userService = userService;
+        this.wishlistService = wishlistService;
     }
 
     @GetMapping("/")
@@ -72,13 +76,17 @@ public class HomeController {
         model.addAttribute("averageRating", reviewService.averageRating(product));
 
         boolean canReview = false;
+        boolean inWishlist = false;
         if (principal != null) {
             User customer = userService.findByEmail(principal.getUsername());
             canReview = reviewService.hasPurchased(customer, product)
                     && !reviewService.hasAlreadyReviewed(product, customer);
+            inWishlist = wishlistService.isInWishlist(customer, product);
         }
         model.addAttribute("canReview", canReview);
+        model.addAttribute("inWishlist", inWishlist);
 
         return "product-detail";
     }
 }
+

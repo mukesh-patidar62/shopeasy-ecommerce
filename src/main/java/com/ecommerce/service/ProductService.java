@@ -35,6 +35,13 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    /** Products running low (but not zero) - used to flag restocking on the admin dashboard. */
+    public List<Product> findLowStock(int threshold) {
+        return productRepository.findAll().stream()
+                .filter(p -> p.getStock() > 0 && p.getStock() <= threshold)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     public Product findById(Long id) {
         return productRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Product not found: " + id));

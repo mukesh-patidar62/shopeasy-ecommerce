@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/products/*/reviews").hasAnyRole("ADMIN", "CUSTOMER")
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/uploads/**", "/products", "/products/**", "/h2-console/**", "/api/chat", "/api/webhooks/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/cart/**", "/checkout/**", "/payment/**", "/orders/**").hasAnyRole("ADMIN", "CUSTOMER")
+                        .requestMatchers("/cart/**", "/checkout/**", "/payment/**", "/orders/**", "/wishlist/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -27,18 +27,15 @@ public class Product {
     // Leave null if there's no discount - we never fabricate a fake original price.
     private BigDecimal originalPrice;
 
-    public BigDecimal getOriginalPrice() { return originalPrice; }
-    public void setOriginalPrice(BigDecimal originalPrice) { this.originalPrice = originalPrice; }
-
     private Integer stock = 0;
 
     private String category;
 
-    private String imageUrl; // relative path under /uploads, e.g. /uploads/xyz.jpg
+    private String imageUrl; // Cloudinary secure URL
 
     @ManyToOne
     @JoinColumn(name = "created_by")
-    private User createdBy; // which admin added it
+    private User createdBy;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -51,6 +48,9 @@ public class Product {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public BigDecimal getOriginalPrice() { return originalPrice; }
+    public void setOriginalPrice(BigDecimal originalPrice) { this.originalPrice = originalPrice; }
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
