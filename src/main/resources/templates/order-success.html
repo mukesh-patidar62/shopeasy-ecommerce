@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -14,6 +15,9 @@
     <h1 class="text-success">✅</h1>
     <h3>Order Confirmed!</h3>
     <p>Thank you — your order #<span th:text="${order.id}"></span> has been placed successfully.</p>
+    <p th:if="${order.paymentMethod.name() == 'COD'}" class="text-muted">
+        Pay ₹<span th:text="${order.totalAmount}"></span> in cash when your order arrives.
+    </p>
     <p>Status: <strong th:text="${order.status}"></strong></p>
     <a href="/orders" class="btn btn-primary mt-3">View My Orders</a>
     <a href="/" class="btn btn-outline-secondary mt-3">Continue Shopping</a>

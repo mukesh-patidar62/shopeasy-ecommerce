@@ -26,12 +26,14 @@ public class OrderService {
      * cartItems: map of productId -> quantity
      */
     public Orders createOrderFromCart(User customer, Map<Long, Integer> cartItems,
-                                      String shippingName, String shippingPhone, String shippingAddress) {
+                                      String shippingName, String shippingPhone, String shippingAddress,
+                                      Orders.PaymentMethod paymentMethod) {
         Orders order = new Orders();
         order.setCustomer(customer);
         order.setShippingName(shippingName);
         order.setShippingPhone(shippingPhone);
         order.setShippingAddress(shippingAddress);
+        order.setPaymentMethod(paymentMethod);
 
         BigDecimal total = BigDecimal.ZERO;
         for (Map.Entry<Long, Integer> entry : cartItems.entrySet()) {
@@ -50,6 +52,22 @@ public class OrderService {
         }
         order.setTotalAmount(total);
         return orderRepository.save(order);
+    }
+
+    /**
+     * Places a Cash on Delivery order: skips Razorpay entirely, confirms the order
+     * immediately, and reduces stock right away since the customer has committed
+     * to the purchase (payment happens physically on delivery instead).
+     */
+    public Orders placeCodOrder(User customer, Map<Long, Integer> cartItems,
+                                String shippingName, String shippingPhone, String shippingAddress) {
+        Orders order = createOrderFromCart(customer, cartItems, shippingName, shippingPhone, shippingAddress,
+                Orders.PaymentMethod.COD);
+        order.setStatus(Orders.OrderStatus.CONFIRMED);
+        orderRepository.save(order);
+        reduceStock(order);
+        emailService.sendOrderConfirmation(order);
+        return order;
     }
 
     public Orders save(Orders order) {

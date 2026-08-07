@@ -36,11 +36,12 @@ public class CheckoutController {
     @SuppressWarnings("unchecked")
     @PostMapping("/checkout")
     public String placeOrder(@AuthenticationPrincipal UserDetails principal,
-                              @RequestParam String shippingName,
-                              @RequestParam String shippingPhone,
-                              @RequestParam String shippingAddress,
-                              HttpSession session,
-                              Model model) {
+                             @RequestParam String shippingName,
+                             @RequestParam String shippingPhone,
+                             @RequestParam String shippingAddress,
+                             @RequestParam(defaultValue = "ONLINE") String paymentMethod,
+                             HttpSession session,
+                             Model model) {
         User customer = userService.findByEmail(principal.getUsername());
         Map<Long, Integer> cart = (Map<Long, Integer>) session.getAttribute("cart");
 
@@ -48,7 +49,14 @@ public class CheckoutController {
             return "redirect:/cart";
         }
 
-        Orders order = orderService.createOrderFromCart(customer, cart, shippingName, shippingPhone, shippingAddress);
+        if ("COD".equals(paymentMethod)) {
+            Orders order = orderService.placeCodOrder(customer, cart, shippingName, shippingPhone, shippingAddress);
+            session.removeAttribute("cart"); // COD is confirmed immediately, no payment step needed
+            return "redirect:/order-success/" + order.getId();
+        }
+
+        Orders order = orderService.createOrderFromCart(customer, cart, shippingName, shippingPhone, shippingAddress,
+                Orders.PaymentMethod.ONLINE);
         return "redirect:/payment/" + order.getId();
     }
 }

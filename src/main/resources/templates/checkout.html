@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -27,9 +28,36 @@
             <label class="form-label">Delivery Address</label>
             <textarea name="shippingAddress" class="form-control" rows="3" required th:text="${customer.address}"></textarea>
         </div>
-        <button type="submit" class="btn btn-success w-100">Continue to Payment</button>
+
+        <div class="mb-4">
+            <label class="form-label d-block">Payment Method</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payOnline" value="ONLINE" checked>
+                <label class="form-check-label" for="payOnline">
+                    Pay Online <span class="text-muted small">(Card / UPI / Netbanking via Razorpay)</span>
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payCod" value="COD">
+                <label class="form-check-label" for="payCod">
+                    Cash on Delivery <span class="text-muted small">(pay when it arrives)</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100" id="checkoutBtn">Continue to Payment</button>
     </form>
 </div>
+
+<script>
+    // Button label reflects the chosen method, so it's not misleading for COD (no payment step follows)
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            const btn = document.getElementById('checkoutBtn');
+            btn.textContent = this.value === 'COD' ? 'Place Order (Cash on Delivery)' : 'Continue to Payment';
+        });
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

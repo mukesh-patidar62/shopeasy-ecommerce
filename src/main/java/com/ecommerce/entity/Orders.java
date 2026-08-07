@@ -24,6 +24,13 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod = PaymentMethod.ONLINE;
+
+    public enum PaymentMethod {
+        ONLINE, COD
+    }
+
     // shipping / basic customer details entered at checkout
     private String shippingName;
     private String shippingPhone;
@@ -37,8 +44,11 @@ public class Orders {
     private List<OrderItem> items = new ArrayList<>();
 
     public enum OrderStatus {
-        PENDING, PAID, SHIPPED, DELIVERED, FAILED, CANCELLED
+        PENDING, CONFIRMED, PAID, SHIPPED, DELIVERED, FAILED, CANCELLED
     }
+
+    public PaymentMethod getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

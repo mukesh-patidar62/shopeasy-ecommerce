@@ -18,7 +18,7 @@
     <div class="table-responsive" th:unless="${#lists.isEmpty(orders)}">
         <table class="table table-responsive-cards align-middle">
             <thead>
-            <tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th><th>Status</th><th>Date</th></tr>
+            <tr><th>Order #</th><th>Customer</th><th>Phone</th><th>Address</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr>
             </thead>
             <tbody>
             <tr th:each="order : ${orders}">
@@ -27,13 +27,14 @@
                 <td data-label="Phone" th:text="${order.shippingPhone}"></td>
                 <td data-label="Address" th:text="${order.shippingAddress}"></td>
                 <td data-label="Total" th:text="'₹' + ${order.totalAmount}"></td>
+                <td data-label="Payment" th:text="${order.paymentMethod.name() == 'COD'} ? 'Cash on Delivery' : 'Online'"></td>
                 <td data-label="Status">
                     <span class="badge mb-1 d-block"
-                          th:classappend="${order.status.name() == 'PAID'} ? 'bg-success' : (${order.status.name() == 'SHIPPED'} ? 'bg-info text-dark' : (${order.status.name() == 'DELIVERED'} ? 'bg-primary' : (${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 'bg-danger')))"
+                          th:classappend="${order.status.name() == 'PAID'} ? 'bg-success' : (${order.status.name() == 'CONFIRMED'} ? 'bg-success' : (${order.status.name() == 'SHIPPED'} ? 'bg-info text-dark' : (${order.status.name() == 'DELIVERED'} ? 'bg-primary' : (${order.status.name() == 'PENDING'} ? 'bg-warning text-dark' : 'bg-danger'))))"
                           th:text="${order.status}"></span>
-                    <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="d-flex gap-1" th:if="${order.status.name() == 'PAID' or order.status.name() == 'SHIPPED'}">
+                    <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="d-flex gap-1" th:if="${order.status.name() == 'PAID' or order.status.name() == 'CONFIRMED' or order.status.name() == 'SHIPPED'}">
                         <select name="status" class="form-select form-select-sm">
-                            <option th:if="${order.status.name() == 'PAID'}" value="SHIPPED">Mark Shipped</option>
+                            <option th:if="${order.status.name() == 'PAID' or order.status.name() == 'CONFIRMED'}" value="SHIPPED">Mark Shipped</option>
                             <option th:if="${order.status.name() == 'SHIPPED'}" value="DELIVERED">Mark Delivered</option>
                         </select>
                         <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
