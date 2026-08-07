@@ -14,10 +14,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final EmailService emailService;
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, ProductRepository productRepository, EmailService emailService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.emailService = emailService;
     }
 
     /**
@@ -96,6 +98,7 @@ public class OrderService {
                 order.setStatus(Orders.OrderStatus.PAID);
                 orderRepository.save(order);
                 reduceStock(order);
+                emailService.sendOrderConfirmation(order);
             }
         });
     }

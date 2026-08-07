@@ -1,6 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.entity.Orders;
+import com.ecommerce.service.EmailService;
 import com.ecommerce.service.OrderService;
 import com.ecommerce.service.PaymentService;
 import jakarta.servlet.http.HttpSession;
@@ -16,10 +17,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final OrderService orderService;
+    private final EmailService emailService;
 
-    public PaymentController(PaymentService paymentService, OrderService orderService) {
+    public PaymentController(PaymentService paymentService, OrderService orderService, EmailService emailService) {
         this.paymentService = paymentService;
         this.orderService = orderService;
+        this.emailService = emailService;
     }
 
     /** Shows the payment page which loads Razorpay's Checkout.js widget. */
@@ -57,6 +60,7 @@ public class PaymentController {
             orderService.save(order);
             orderService.reduceStock(order);
             session.removeAttribute("cart"); // empty the cart now that payment succeeded
+            emailService.sendOrderConfirmation(order); // fire-and-forget, never blocks checkout
         } else {
             order.setStatus(Orders.OrderStatus.FAILED);
             orderService.save(order);
@@ -71,3 +75,4 @@ public class PaymentController {
         return "order-success";
     }
 }
+
